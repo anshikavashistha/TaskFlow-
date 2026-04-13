@@ -1,0 +1,46 @@
+# Environment variables
+.env
+
+# Executables
+*.exe
+
+# Test files
+*.test
+
+# Vendor
+/vendor/
+
+# Node modules
+node_modules/
+
+# Build outputs
+dist/
+build/
+out/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# System folders (IMPORTANT for your issue)
+AppData/
+Desktop/
+Documents/
+Downloads/
+
+# Cache
+.cache/
+.temp/
+
+# Misc
+*.local
