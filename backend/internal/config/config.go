@@ -28,6 +28,9 @@ func Load() (Config, error) {
 	if jwtSecret == "" {
 		return Config{}, fmt.Errorf("JWT_SECRET is required")
 	}
+	if len(jwtSecret) < 32 {
+		return Config{}, fmt.Errorf("JWT_SECRET must be at least 32 characters")
+	}
 	if dbHost == "" || dbPort == "" || dbUser == "" || dbPassword == "" || dbName == "" {
 		return Config{}, fmt.Errorf("DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, and DB_NAME are required")
 	}

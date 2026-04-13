@@ -13,6 +13,18 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+var validTaskStatus = map[string]bool{
+	"todo":        true,
+	"in_progress": true,
+	"done":        true,
+}
+
+var validTaskPriority = map[string]bool{
+	"low":    true,
+	"medium": true,
+	"high":   true,
+}
+
 func (a *API) ListTasks(w http.ResponseWriter, r *http.Request) {
 	uid, ok := userID(r)
 	if !ok {
@@ -113,6 +125,18 @@ func (a *API) CreateTask(w http.ResponseWriter, r *http.Request) {
 		respond.Error(w, http.StatusBadRequest, "title is required")
 		return
 	}
+	if len(body.Title) > 255 {
+		respond.Error(w, http.StatusBadRequest, "title too long (max 255 chars)")
+		return
+	}
+	if body.Status != nil && !validTaskStatus[*body.Status] {
+		respond.Error(w, http.StatusBadRequest, "status must be todo, in_progress, or done")
+		return
+	}
+	if body.Priority != nil && !validTaskPriority[*body.Priority] {
+		respond.Error(w, http.StatusBadRequest, "priority must be low, medium, or high")
+		return
+	}
 	st := models.TaskTodo
 	if body.Status != nil {
 		st = models.TaskStatus(*body.Status)
@@ -191,6 +215,18 @@ func (a *API) PatchTask(w http.ResponseWriter, r *http.Request) {
 	var body patchTaskBody
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		respond.Error(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+	if body.Title != nil && len(*body.Title) > 255 {
+		respond.Error(w, http.StatusBadRequest, "title too long (max 255 chars)")
+		return
+	}
+	if body.Status != nil && !validTaskStatus[*body.Status] {
+		respond.Error(w, http.StatusBadRequest, "status must be todo, in_progress, or done")
+		return
+	}
+	if body.Priority != nil && !validTaskPriority[*body.Priority] {
+		respond.Error(w, http.StatusBadRequest, "priority must be low, medium, or high")
 		return
 	}
 	up := db.TaskUpdate{

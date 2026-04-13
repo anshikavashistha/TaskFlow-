@@ -12,6 +12,13 @@ import (
 func New(api *handlers.API) http.Handler {
 	r := chi.NewRouter()
 
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1 MB
+			next.ServeHTTP(w, r)
+		})
+	})
+
 	r.Get("/health", func(w http.ResponseWriter, _ *http.Request) {
 		respond.JSON(w, http.StatusOK, map[string]string{"status": "ok"})
 	})

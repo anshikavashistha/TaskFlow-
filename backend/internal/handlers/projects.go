@@ -60,6 +60,10 @@ func (a *API) CreateProject(w http.ResponseWriter, r *http.Request) {
 		respond.Error(w, http.StatusBadRequest, "name is required")
 		return
 	}
+	if len(body.Name) > 255 {
+		respond.Error(w, http.StatusBadRequest, "name too long (max 255 chars)")
+		return
+	}
 	p, err := db.CreateProject(r.Context(), a.Pool, body.Name, body.Description, uid)
 	if err != nil {
 		respond.Error(w, http.StatusInternalServerError, "could not create project")
@@ -150,6 +154,10 @@ func (a *API) PatchProject(w http.ResponseWriter, r *http.Request) {
 	}
 	if body.Name != nil && *body.Name == "" {
 		respond.Error(w, http.StatusBadRequest, "name cannot be empty")
+		return
+	}
+	if body.Name != nil && len(*body.Name) > 255 {
+		respond.Error(w, http.StatusBadRequest, "name too long (max 255 chars)")
 		return
 	}
 	p, err := db.UpdateProject(ctx, a.Pool, id, body.Name, body.Description)
